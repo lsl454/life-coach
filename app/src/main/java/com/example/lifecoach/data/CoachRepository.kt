@@ -17,7 +17,7 @@ object Schedule { val work= listOf(Slot("WAKE",7,30,12,"SCALE","现在几分精�
 
 class CoachRepository(private val ctx:Context){
  private val db=CoachDatabase.get(ctx); private val gson=Gson()
- private val prefs by lazy { EncryptedSharedPreferences.create("secure",MasterKey.Builder(ctx).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),ctx,EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM) }
+ private val prefs by lazy { EncryptedSharedPreferences.create(ctx,"secure",MasterKey.Builder(ctx).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM) }
  fun apiKey()=prefs.getString("deepseek_key","") ?: ""; fun setApiKey(v:String)=prefs.edit().putString("deepseek_key",v.trim()).apply()
  suspend fun recordWake(){ val d=today(); val old=db.daily().get(d); if(old?.wakeTime==null) db.daily().upsert((old?:DailyRecord(d)).copy(wakeTime=SimpleDateFormat("HH:mm",Locale.getDefault()).format(Date()))) }
  suspend fun quickSmoke(){withContext(Dispatchers.IO){val d=today();val r=db.daily().get(d)?:DailyRecord(d);db.daily().upsert(r.copy(cigarettes=r.cigarettes+1))}}
